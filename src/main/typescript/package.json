@@ -1,0 +1,19 @@
+{
+  "name": "@atomist/travis",
+  "version": "0.1.1",
+  "description": "TypeScript model for Atomist Travis Type",
+  "keywords": [
+    "Atomist",
+    "Rug",
+    "Travis"
+  ],
+  "author": "Atomist, Inc",
+  "license": "Apache-2.0",
+  "atomist" : {
+    "group": "com.atomist",
+    "artifact": "travis-rug-type"
+  },
+  "dependencies": {
+    "@atomist/rug": "0.4.0"
+  }
+}
