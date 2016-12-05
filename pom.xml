@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.atomist</groupId>
     <artifactId>travis-rug-type</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <packaging>jar</packaging>
     <name>scala-rug-type</name>
     <description>Rug extension type for Travis</description>
@@ -204,14 +204,9 @@
     </repositories>
     <distributionManagement>
         <repository>
-            <id>atomist-release</id>
+            <id>public-atomist-release</id>
             <name>Atomist Release</name>
-            <url>https://sforzando.artifactoryonline.com/sforzando/libs-release-local</url>
+            <url>https://atomist.jfrog.io/atomist/libs-release-local</url>
         </repository>
-        <snapshotRepository>
-            <id>atomist-snapshots</id>
-            <name>Atomist Snapshots</name>
-            <url>https://sforzando.artifactoryonline.com/sforzando/libs-snapshot-local</url>
-        </snapshotRepository>
     </distributionManagement>
 </project>

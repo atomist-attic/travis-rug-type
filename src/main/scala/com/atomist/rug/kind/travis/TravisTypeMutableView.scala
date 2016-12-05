@@ -14,8 +14,8 @@ import com.atomist.source.FileArtifact
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.PEMParser
-import org.springframework.http.{HttpHeaders, HttpMethod, RequestEntity}
-import org.springframework.web.client.RestTemplate
+import org.springframework.http.{HttpHeaders, HttpMethod, HttpStatus, RequestEntity}
+import org.springframework.web.client.{HttpClientErrorException, RestTemplate}
 import org.yaml.snakeyaml.{DumperOptions, Yaml}
 
 object TravisTypeMutableView {
@@ -43,8 +43,6 @@ class TravisTypeMutableView(
   override protected def currentContent: String = yaml.dump(mutatableContent).replace("'","")
 
   private val restTemplate: RestTemplate = new RestTemplate()
-
-  // Add your non mutating exported Rug Type functions here.
 
   @ExportFunction(readOnly = false, description = "Enables a project for Travis CI")
   def encrypt(@ExportFunctionParameterDescription(name = "repo",
@@ -91,7 +89,10 @@ class TravisTypeMutableView(
       global.add(secured)
     }
 
-
+    content match {
+      case s: String if content.contains("=") => print(s"  Added encrypted value for ${content.substring(0, content.indexOf("="))}")
+      case _ => print("  Added encrypted value")
+    }
 
   }
 
@@ -101,6 +102,7 @@ class TravisTypeMutableView(
     description = "GitHub Token") token: String, @ExportFunctionParameterDescription(name = "org",
     description = ".com or .org") org: String): Unit = {
     hook(true, repo, token, org)
+    print(s"  Enabled repository" )
   }
 
   @ExportFunction(readOnly = true, description = "Disables a project for Travis CI")
@@ -109,10 +111,12 @@ class TravisTypeMutableView(
     description = "GitHub Token") token: String, @ExportFunctionParameterDescription(name = "org",
     description = ".com or .org") org: String): Unit = {
     hook(false, repo, token, org)
+    print(s"  Disabled repository" )
   }
 
   def hook(active: Boolean, repo: String, token: String, org: String) = {
     val authHeaders = getAuth(token, org)
+    sync(authHeaders, org)
     val id: Int = getRepo(authHeaders, repo, org)
 
     val hook = new util.HashMap[String, Any]()
@@ -123,6 +127,27 @@ class TravisTypeMutableView(
 
     val request = new RequestEntity(body, getAuth(token, org), HttpMethod.PUT, URI.create(s"https://api.travis-ci${org}/hooks"));
     restTemplate.put(s"https://api.travis-ci${org}/hooks", request);
+  }
+
+  def sync(headers: HttpHeaders, org: String) = {
+    val request = new RequestEntity[util.Map[String, Object]](headers, HttpMethod.POST, URI.create(s"https://api.travis-ci${org}/users/sync"))
+    restTemplate.exchange(request, classOf[util.Map[String, Object]])
+    import scala.util.control.Breaks._
+    breakable { for (i <- 0 to 30) {
+      try {
+        val responseEntity = restTemplate.exchange(request, classOf[util.Map[String, Object]])
+        if (responseEntity.getStatusCode == HttpStatus.OK) {
+          break
+        }
+      }
+      catch {
+        case he: HttpClientErrorException if he.getStatusCode == HttpStatus.CONFLICT => {
+          print(s"  Syncing repositories" )
+          Thread.sleep(1000L)
+        }
+        case _ => break
+      }
+    } }
   }
 
   def getRepo(headers: HttpHeaders, repo: String, org: String): Int = {
@@ -137,6 +162,9 @@ class TravisTypeMutableView(
 
     val headers = new HttpHeaders()
     headers.add("Authorization", s"token ${token}")
+    headers.add("Content-Type", "application/json")
+    headers.add("Content", "application/vnd.travis-ci.2+json")
+    headers.add("User-Agent", "Travis")
     headers
   }
 
