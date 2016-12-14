@@ -1,15 +1,14 @@
-travis-rug-type
-===========================
+# Atomist 'travis-rug-type'
 
-Originally created on {{creation_date}}.
+[![Build Status](https://travis-ci.org/atomist-rugs/travis-rug-type.svg?branch=master)](https://travis-ci.org/atomist-rugs/travis-rug-type)
+[![Slack Status](https://join.atomist.com/badge.svg)](https://join.atomist.com)
 
-Rug extension type for Travis
+Rug extension type for Travis CI.
 
-To build and test
---------------
+## Developing
 
 To build and test this project:
 
-```shell
-> mvn test
+```
+$ mvn test
 ```
