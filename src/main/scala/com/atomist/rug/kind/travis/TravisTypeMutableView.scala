@@ -145,7 +145,7 @@ class TravisTypeMutableView(
           print(s"  Syncing repositories" )
           Thread.sleep(1000L)
         }
-        case _ => break
+        case _: Throwable => break
       }
     } }
   }
