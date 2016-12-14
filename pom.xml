@@ -12,12 +12,14 @@
         <timestamp>${maven.build.timestamp}</timestamp>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
+        <scala.version>2.12.1</scala.version>
+        <scala.binary.version>2.12</scala.binary.version>
     </properties>
     <dependencies>
       <dependency>
           <groupId>com.atomist</groupId>
           <artifactId>rug</artifactId>
-          <version>0.4.0</version>
+          <version>0.6.0</version>
       </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -26,14 +28,14 @@
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_2.11</artifactId>
-            <version>3.0.0</version>
+            <artifactId>scalatest_${scala.binary.version}</artifactId>
+            <version>3.0.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
     <profiles>
         <profile>
-            <id>scala-2.11</id>
+            <id>scala-${scala.binary.version}</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -41,11 +43,11 @@
                 <dependency>
                     <groupId>org.scala-lang</groupId>
                     <artifactId>scala-library</artifactId>
-                    <version>2.11.8</version>
+                    <version>${scala.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.scala-lang.modules</groupId>
-                    <artifactId>scala-xml_2.11</artifactId>
+                    <artifactId>scala-xml_${scala.binary.version}</artifactId>
                     <version>1.0.5</version>
                 </dependency>
             </dependencies>
@@ -140,7 +142,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <scalaCompatVersion>2.11</scalaCompatVersion>
+                    <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
                     <args>
                         <arg>-unchecked</arg>
                         <!-- work-around for https://issues.scala-lang.org/browse/SI-8358 -->
