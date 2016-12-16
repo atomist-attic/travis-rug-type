@@ -43,9 +43,6 @@ function main() {
         return 1
     fi
 
-    cd "$target"
-    cd user-model
-
     if [[ $NPM_TOKEN ]]; then
         msg "Creating local .npmrc using API key from environment"
         if ! ( umask 077 && echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" > "$HOME/.npmrc" ); then
@@ -53,14 +50,14 @@ function main() {
             return 1
         fi
     else
-        echo "assuming your .npmrc is setup correctly for this project"
+        msg "assuming your .npmrc is setup correctly for this project"
     fi
 
     # npm honors this
     rm -f "$target/.gitignore"
 
     if ! ( cd "$target" && npm publish --access=public ); then
-        error "failed to publish node module"
+        err "failed to publish node module"
         cat "$target/npm-debug.log"
         return 1
     fi
