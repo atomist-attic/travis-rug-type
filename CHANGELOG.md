@@ -19,6 +19,12 @@ Travisinator release
 
 -   Automate build and release on Travis CI
 
+-   Docs
+
+### Changed
+
+-   Updated to rug 0.7.0
+
 ## [0.2.0] - 2016-12-07
 
 [0.2.0]: https://github.com/atomist-rugs/travis-rug-type/compare/9df28a4...0.2.0
