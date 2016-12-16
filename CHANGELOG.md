@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/atomist-rugs/travis-rug-type/compare/0.3.1...HEAD
+[Unreleased]: https://github.com/atomist-rugs/travis-rug-type/compare/0.3.2...HEAD
+
+## [0.3.2] - 2016-12-16
+
+[0.3.2]: https://github.com/atomist-rugs/travis-rug-type/compare/0.3.1...0.3.2
+
+What the rug? release
+
+### Added
+
+-   Fix rug dependency in package.json
 
 ## [0.3.1] - 2016-12-16
 
