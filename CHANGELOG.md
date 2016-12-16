@@ -7,13 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/atomist-rugs/travis-rug-type/compare/0.3.0...HEAD
+[Unreleased]: https://github.com/atomist-rugs/travis-rug-type/compare/0.3.1...HEAD
 
-## [0.3.0] - 2016-12-16
+## [0.3.1] - 2016-12-16
 
-[0.3.0]: https://github.com/atomist-rugs/travis-rug-type/compare/0.2.0...0.3.0
+[0.3.1]: https://github.com/atomist-rugs/travis-rug-type/compare/0.2.0...0.3.1
 
-Travisinator release
+Brand new rug release
 
 ### Added
 
