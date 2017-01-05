@@ -1,11 +1,11 @@
 package com.atomist.rug.kind.travis
 
 import com.atomist.project.ProjectOperationArguments
-import com.atomist.rug.kind.core.{FileMutableView, ProjectMutableView}
+import com.atomist.rug.kind.core.{FileMutableView, FileType, ProjectMutableView, ProjectType}
 import com.atomist.rug.kind.dynamic.ContextlessViewFinder
 import com.atomist.rug.parser.Selected
 import com.atomist.rug.runtime.rugdsl.{DefaultEvaluator, Evaluator}
-import com.atomist.rug.spi.{MutableView, ReflectivelyTypedType, Type}
+import com.atomist.rug.spi.{MutableView, ReflectivelyTypedType, Type, Typed}
 import com.atomist.source.ArtifactSource
 
 class TravisType (
@@ -17,7 +17,8 @@ class TravisType (
 
   def this() = this(DefaultEvaluator)
 
-  override val resolvesFromNodeTypes: Set[String] = Set("project")
+  override val resolvesFromNodeTypes: Set[String] =
+    Typed.typeClassesToTypeNames(classOf[ProjectType], classOf[FileType])
 
   // Give your type a useful description
   override def description = "Travis CI type for manipulating CI configuration"

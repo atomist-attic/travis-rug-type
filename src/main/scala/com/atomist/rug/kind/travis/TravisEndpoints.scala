@@ -6,7 +6,7 @@ import java.util.Collections
 
 import com.atomist.rug.InvalidRugParameterPatternException
 import org.springframework.http.{HttpHeaders, HttpMethod, HttpStatus, RequestEntity}
-import org.springframework.web.client.{HttpClientErrorException, RestTemplate}
+import org.springframework.web.client.{HttpClientErrorException, RestClientException, RestTemplate}
 
 trait TravisAPIEndpoint {
 
@@ -79,21 +79,30 @@ trait TravisEndpoints {
 
 object TravisEndpoints {
 
-  /** Construct standard Travis API headers
+  /** Construct standard Travis API headers.
+    *
+    * @param endpoint org|com
+    * @return Travis API headers
+    */
+  def headers(endpoint: TravisAPIEndpoint): HttpHeaders = {
+    val noAuthHeaders = new HttpHeaders()
+    noAuthHeaders.add("Content-Type", "application/json")
+    noAuthHeaders.add("Accept", "application/vnd.travis-ci.2+json")
+    noAuthHeaders.add("User-Agent", "Travis/1.6.8")
+    noAuthHeaders
+  }
+
+  /** Construct standard Travis API headers with Authorization token.
     *
     * @param endpoint org|com
     * @param token Travis API token returned from TravisEndpoints.postAuthGitHub
     * @return Travis API headers
     */
-  def headers(endpoint: TravisAPIEndpoint, token: String): HttpHeaders = {
-    val headers = new HttpHeaders()
-    headers.add("Authorization", s"token $token")
-    headers.add("Content-Type", "application/json")
-    headers.add("Accept", "application/vnd.travis-ci.2+json")
-    headers.add("User-Agent", "Travis/1.6.8")
-    headers
+  def authHeaders(endpoint: TravisAPIEndpoint, token: String): HttpHeaders = {
+    val hdrs = headers(endpoint)
+    hdrs.add("Authorization", s"""token "$token"""")
+    hdrs
   }
-
 }
 
 class RealTravisEndpoints extends TravisEndpoints {
@@ -112,7 +121,7 @@ class RealTravisEndpoints extends TravisEndpoints {
 
   def putHook(endpoint: TravisAPIEndpoint, headers: HttpHeaders, body: util.HashMap[String, Object]): Unit = {
     val url: String = s"https://api.travis-ci.${endpoint.tld}/hooks"
-    // why is the URL and HTTP action specified twice?
+    // why are the URL and HTTP action specified twice?
     val request = new RequestEntity(
       body,
       headers,
@@ -128,7 +137,12 @@ class RealTravisEndpoints extends TravisEndpoints {
       HttpMethod.POST,
       URI.create(s"https://api.travis-ci.${endpoint.tld}/users/sync")
     )
-    restTemplate.exchange(request, classOf[util.Map[String, Object]])
+    try {
+      restTemplate.exchange(request, classOf[util.Map[String, Object]])
+    }
+    catch {
+      case he: HttpClientErrorException if he.getStatusCode == HttpStatus.CONFLICT =>
+    }
     import scala.util.control.Breaks._
     breakable {
       for (i <- 0 to 30) {
@@ -140,7 +154,7 @@ class RealTravisEndpoints extends TravisEndpoints {
         }
         catch {
           case he: HttpClientErrorException if he.getStatusCode == HttpStatus.CONFLICT =>
-            print(s"  Syncing repositories ($i)")
+            print(s"  Waiting for repositories to sync ($i)")
             Thread.sleep(1000L)
           case _: Throwable => break
         }
@@ -155,7 +169,8 @@ class RealTravisEndpoints extends TravisEndpoints {
       URI.create(s"https://api.travis-ci.${endpoint.tld}/repos/$repo")
     )
     val responseEntity = restTemplate.exchange(request, classOf[util.Map[String, Object]])
-    responseEntity.getBody.get("id").asInstanceOf[Int]
+    val repoObject: util.Map[String, Object] = responseEntity.getBody.get("repo").asInstanceOf[util.Map[String, Object]]
+    repoObject.get("id").asInstanceOf[Int]
   }
 
   // Use evil var to cache token because Travis CI does not want you to
@@ -164,11 +179,14 @@ class RealTravisEndpoints extends TravisEndpoints {
   def postAuthGitHub(endpoint: TravisAPIEndpoint, githubToken: String): String =
     if (travisToken != "") travisToken
     else {
-      travisToken = restTemplate.postForObject(
-        s"https://api.travis-ci.${endpoint.tld}/auth/github",
+      val request = new RequestEntity(
         Collections.singletonMap("github_token", githubToken),
-        classOf[util.Map[String, String]]
-      ).get("access_token")
+        TravisEndpoints.headers(endpoint),
+        HttpMethod.POST,
+        URI.create(s"https://api.travis-ci.${endpoint.tld}/auth/github")
+      )
+      val responseEntity = restTemplate.exchange(request, classOf[util.Map[String, String]])
+      travisToken = responseEntity.getBody.get("access_token")
       travisToken
     }
 

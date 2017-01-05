@@ -1,7 +1,6 @@
 package com.atomist.rug.kind.travis
 
 import java.io.StringReader
-import java.net.URI
 import java.security.{KeyFactory, Security}
 import java.security.spec.X509EncodedKeySpec
 import java.util
@@ -14,8 +13,7 @@ import com.atomist.source.FileArtifact
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.openssl.PEMParser
-import org.springframework.http.{HttpHeaders, HttpMethod, RequestEntity}
-import org.springframework.web.client.RestTemplate
+import org.springframework.http.HttpHeaders
 import org.yaml.snakeyaml.{DumperOptions, Yaml}
 
 object TravisMutableView {
@@ -34,15 +32,13 @@ class TravisMutableView(
                        )
   extends LazyFileArtifactBackedMutableView(originalBackingObject, parent) {
 
-  override def nodeName = "travis"
+  override def nodeName = "Travis"
 
   import TravisMutableView._
 
   private val mutatableContent = yaml.load(originalBackingObject.content).asInstanceOf[util.Map[String, Any]]
 
   override protected def currentContent: String = yaml.dump(mutatableContent).replace("'","")
-
-  private val restTemplate: RestTemplate = new RestTemplate()
 
   @ExportFunction(readOnly = false, description = "Enables a project for Travis CI")
   def encrypt(
@@ -105,7 +101,7 @@ class TravisMutableView(
   private[travis] def hook(active: Boolean, repo: String, githubToken: String, org: String): Unit = {
     val api: TravisAPIEndpoint = TravisAPIEndpoint.stringToTravisEndpoint(org)
     val token: String = travisEndpoints.postAuthGitHub(api, githubToken)
-    val headers: HttpHeaders = TravisEndpoints.headers(api, token)
+    val headers: HttpHeaders = TravisEndpoints.authHeaders(api, token)
 
     travisEndpoints.postUsersSync(api, headers)
 
@@ -123,7 +119,7 @@ class TravisMutableView(
   private[travis] def encryptString(repo: String, githubToken: String, org: String, content: String): String = {
     val api: TravisAPIEndpoint = TravisAPIEndpoint.stringToTravisEndpoint(org)
     val token: String = travisEndpoints.postAuthGitHub(api, githubToken)
-    val headers: HttpHeaders = TravisEndpoints.headers(api, token)
+    val headers: HttpHeaders = TravisEndpoints.authHeaders(api, token)
 
     val key = travisEndpoints.getRepoKey(api, headers, repo)
 
