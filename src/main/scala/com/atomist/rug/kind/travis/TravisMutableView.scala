@@ -52,23 +52,7 @@ class TravisMutableView(
                @ExportFunctionParameterDescription(name = "content", description = "Content") content: String
              ): Unit = {
 
-    val api: TravisAPIEndpoint = TravisAPIEndpoint.stringToTravisEndpoint(org)
-    val token: String = travisEndpoints.postAuthGitHub(api, githubToken)
-    val headers: HttpHeaders = TravisEndpoints.headers(api, token)
-
-    val key = travisEndpoints.getRepoKey(api, headers, repo)
-
-    val parser = new PEMParser(new StringReader(key))
-    val ob = parser.readObject().asInstanceOf[SubjectPublicKeyInfo]
-
-    val pubKeySpec = new X509EncodedKeySpec(ob.getEncoded())
-    val keyFactory = KeyFactory.getInstance("RSA")
-    val publicKey = keyFactory.generatePublic(pubKeySpec)
-
-    val rsaCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
-    rsaCipher.init(Cipher.ENCRYPT_MODE, publicKey)
-
-    val secured = s"secure: ${Base64.getEncoder.encodeToString(rsaCipher.doFinal(content.getBytes()))}"
+    val secured = encryptString(repo, githubToken, org, content)
 
     if (mutatableContent.containsKey("env") && mutatableContent.get("env").asInstanceOf[util.Map[String, Any]].containsKey("global")) {
       if (mutatableContent.get("env").asInstanceOf[util.Map[String, Any]].get("global").asInstanceOf[util.List[String]] != null) {
@@ -134,6 +118,26 @@ class TravisMutableView(
     body.put("hook", hook)
 
     travisEndpoints.putHook(api, headers, body)
+  }
+
+  private[travis] def encryptString(repo: String, githubToken: String, org: String, content: String): String = {
+    val api: TravisAPIEndpoint = TravisAPIEndpoint.stringToTravisEndpoint(org)
+    val token: String = travisEndpoints.postAuthGitHub(api, githubToken)
+    val headers: HttpHeaders = TravisEndpoints.headers(api, token)
+
+    val key = travisEndpoints.getRepoKey(api, headers, repo)
+
+    val parser = new PEMParser(new StringReader(key))
+    val ob = parser.readObject().asInstanceOf[SubjectPublicKeyInfo]
+
+    val pubKeySpec = new X509EncodedKeySpec(ob.getEncoded())
+    val keyFactory = KeyFactory.getInstance("RSA")
+    val publicKey = keyFactory.generatePublic(pubKeySpec)
+
+    val rsaCipher = Cipher.getInstance("RSA/ECB/PKCS1Padding")
+    rsaCipher.init(Cipher.ENCRYPT_MODE, publicKey)
+
+    s"secure: ${Base64.getEncoder.encodeToString(rsaCipher.doFinal(content.getBytes()))}"
   }
 
 }
