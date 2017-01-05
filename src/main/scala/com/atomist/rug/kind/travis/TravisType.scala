@@ -1,7 +1,7 @@
 package com.atomist.rug.kind.travis
 
 import com.atomist.project.ProjectOperationArguments
-import com.atomist.rug.kind.core.{FileArtifactMutableView, ProjectMutableView}
+import com.atomist.rug.kind.core.{FileMutableView, ProjectMutableView}
 import com.atomist.rug.kind.dynamic.ContextlessViewFinder
 import com.atomist.rug.parser.Selected
 import com.atomist.rug.runtime.rugdsl.{DefaultEvaluator, Evaluator}
@@ -19,13 +19,10 @@ class TravisType (
 
   override val resolvesFromNodeTypes: Set[String] = Set("project")
 
-  // Give your type a name to identify it in Rug when using with
-  override def name = "travis"
-
   // Give your type a useful description
-  override def description = "Travis Type file"
+  override def description = "Travis CI type for manipulating CI configuration"
 
-  override def viewManifest: Manifest[TravisTypeMutableView] = manifest[TravisTypeMutableView]
+  override def viewManifest: Manifest[TravisMutableView] = manifest[TravisMutableView]
 
   override protected def findAllIn(rugAs: ArtifactSource, selected: Selected, context: MutableView[_],
                                    poa: ProjectOperationArguments,
@@ -33,11 +30,11 @@ class TravisType (
     context match {
       case pmv: ProjectMutableView =>
         Some(pmv.currentBackingObject.allFiles
-          .filter(f => f.name == (".travis.yml"))
-          .map(f => new TravisTypeMutableView(f, pmv))
+          .filter(f => f.name == ".travis.yml")
+          .map(f => new TravisMutableView(f, pmv, new RealTravisEndpoints))
         )
-      case fav: FileArtifactMutableView if fav.name == ".travis.yml" =>
-        Some(Seq(new TravisTypeMutableView(fav.currentBackingObject, fav.parent)))
+      case fav: FileMutableView if fav.name == ".travis.yml" =>
+        Some(Seq(new TravisMutableView(fav.currentBackingObject, fav.parent, new RealTravisEndpoints)))
       case _ => None
     }
   }

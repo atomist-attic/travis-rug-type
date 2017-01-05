@@ -14,12 +14,13 @@
         <java.version>1.8</java.version>
         <scala.version>2.11.8</scala.version>
         <scala.binary.version>2.11</scala.binary.version>
+		<rug.version>0.8.0</rug.version>
     </properties>
     <dependencies>
       <dependency>
           <groupId>com.atomist</groupId>
           <artifactId>rug</artifactId>
-          <version>0.7.1</version>
+          <version>${rug.version}</version>
       </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -175,6 +176,80 @@
                 <configuration>
                     <highlighting>true</highlighting>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>copy-ts</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <target>
+								<mkdir dir="${project.build.directory}/typescript" />
+                                <copy todir="${project.build.directory}/typescript">
+                                    <fileset dir="${project.basedir}/src/main/typescript"/>
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+					<execution>
+						<id>npm-package</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>process-resources</phase>
+						<configuration>
+							<target>
+								<copy
+									file="${project.basedir}/src/main/typescript/package.json"
+									tofile="${project.build.directory}/typescript/package.json"
+									overwrite="true">
+									<filterchain>
+										<expandproperties />
+									</filterchain>
+								</copy>
+							</target>
+						</configuration>
+					</execution>
+                    <execution>
+                        <id>npm-install</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target>
+                                <exec
+									dir="${project.build.directory}/typescript"
+									executable="npm"
+									failonerror="true">
+                                    <arg value="install" />
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-typescript</id>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target>
+                                <exec
+									dir="${project.build.directory}/typescript"
+									executable="tsc"
+									failonerror="true">
+                                </exec>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
