@@ -1,0 +1,1 @@
+com.atomist.rug.commands.travis.TravisCommand

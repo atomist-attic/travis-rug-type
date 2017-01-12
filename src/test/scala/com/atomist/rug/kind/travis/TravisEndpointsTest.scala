@@ -1,5 +1,7 @@
 package com.atomist.rug.kind.travis
 
+import java.util.Collections
+
 import com.atomist.rug.InvalidRugParameterPatternException
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -30,7 +32,7 @@ class TravisEndpointsTest extends FlatSpec with Matchers {
   "RealTravisEndpoints" should "return cached token" in {
     val t: String = "notarealtravistoken"
     val rte: RealTravisEndpoints = new RealTravisEndpoints
-    rte.travisToken = t
+    rte.travisTokens = Collections.singletonMap("doesnotmatter", "notarealtravistoken")
     val api: TravisAPIEndpoint = TravisOrgEndpoint
     rte.postAuthGitHub(api, "doesnotmatter") should be(t)
   }

@@ -22,6 +22,8 @@ class TravisMutableViewTest extends FlatSpec with Matchers {
 
     def postAuthGitHub(endpoint: TravisAPIEndpoint, githubToken: String): String = "xZ-dkkuUBH7823CMfm3WeR"
 
+    def postRestartBuild(endpoint: TravisAPIEndpoint, headers: HttpHeaders, number: Int) = ???
+
   }
 
   val f = StringFileArtifact(
