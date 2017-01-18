@@ -4,10 +4,11 @@ import com.atomist.rug.kind.service.ServicesMutableView
 import com.atomist.rug.kind.travis.{RealTravisEndpoints, TravisAPIEndpoint, TravisEndpoints}
 import com.atomist.rug.spi.Command
 import org.springframework.http.HttpHeaders
+import java.util.{Collections, Set}
 
 class TravisCommand extends Command[ServicesMutableView] {
 
-  override def nodeTypes: Set[String] = Set("services")
+  override def nodeTypes: Set[String] = Collections.singleton("services")
 
   override def name: String = "travis"
 
