@@ -70,8 +70,8 @@ class TravisMutableView(
     }
 
     content match {
-      case _: String if content.contains("=") => print(s"  Added encrypted value for ${content.substring(0, content.indexOf("="))}")
-      case _ => print("  Added encrypted value")
+      case _: String if content.contains("=") => println(s"  Added encrypted value for ${content.substring(0, content.indexOf("="))}")
+      case _ => println("  Added encrypted value")
     }
 
   }
@@ -84,7 +84,7 @@ class TravisMutableView(
             ): Unit = {
     val enableTravis = true
     hook(enableTravis, repo, token, org)
-    print("  Enabled repository" )
+    println("  Enabled repository" )
   }
 
   @ExportFunction(readOnly = true, description = "Disables a project for Travis CI")
@@ -95,7 +95,7 @@ class TravisMutableView(
              ): Unit = {
     val disableTravis = false
     hook(disableTravis, repo, token, org)
-    print("  Disabled repository" )
+    println("  Disabled repository" )
   }
 
   private[travis] def hook(active: Boolean, repo: String, githubToken: String, org: String): Unit = {

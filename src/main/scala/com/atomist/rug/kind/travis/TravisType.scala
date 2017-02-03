@@ -7,6 +7,7 @@ import com.atomist.rug.parser.Selected
 import com.atomist.rug.runtime.rugdsl.{DefaultEvaluator, Evaluator}
 import com.atomist.rug.spi.{MutableView, ReflectivelyTypedType, Type, Typed}
 import com.atomist.source.ArtifactSource
+import com.atomist.tree.TreeNode
 
 class TravisType (
                             evaluator: Evaluator
@@ -25,9 +26,12 @@ class TravisType (
 
   override def viewManifest: Manifest[TravisMutableView] = manifest[TravisMutableView]
 
-  override protected def findAllIn(rugAs: ArtifactSource, selected: Selected, context: MutableView[_],
-                                   poa: ProjectOperationArguments,
-                                   identifierMap: Map[String, Object]): Option[Seq[MutableView[_]]] = {
+  override protected def findAllIn(
+                                    rugAs: ArtifactSource,
+                                    selected: Selected,
+                                    context: TreeNode,
+                                    poa: ProjectOperationArguments,
+                                    identifierMap: Map[String, Object]): Option[Seq[TreeNode]] = {
     context match {
       case pmv: ProjectMutableView =>
         Some(pmv.currentBackingObject.allFiles
