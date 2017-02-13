@@ -5,6 +5,17 @@
 
 Rug extension type for Travis CI.
 
+## Using
+
+To gain access to this language extension in your Rug Archive, add to `.atomist/manifest.yml`:
+
+```
+extensions:
+  - 'com.atomist:travis-rug-type:0.8.0'
+```
+
+See [Travis editors](https://github.com/atomist-rugs/travis-editors) for an example.
+
 ## Developing
 
 To build and test this project:
