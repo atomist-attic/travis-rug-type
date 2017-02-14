@@ -1,38 +1,23 @@
 package com.atomist.rug.kind.travis
 
-import com.atomist.project.ProjectOperationArguments
-import com.atomist.rug.kind.core.{FileMutableView, FileType, ProjectMutableView, ProjectType}
-import com.atomist.rug.kind.dynamic.ContextlessViewFinder
-import com.atomist.rug.parser.Selected
+import com.atomist.rug.kind.core.{FileMutableView, ProjectMutableView}
+import com.atomist.rug.kind.dynamic.ChildResolver
 import com.atomist.rug.runtime.rugdsl.{DefaultEvaluator, Evaluator}
-import com.atomist.rug.spi.{MutableView, ReflectivelyTypedType, Type, Typed}
-import com.atomist.source.ArtifactSource
+import com.atomist.rug.spi.{ReflectivelyTypedType, Type}
 import com.atomist.tree.TreeNode
 
-class TravisType (
-                            evaluator: Evaluator
-                          )
+class TravisType (evaluator: Evaluator)
   extends Type(evaluator)
-    with ContextlessViewFinder
+    with ChildResolver
     with ReflectivelyTypedType {
 
   def this() = this(DefaultEvaluator)
 
-  override val resolvesFromNodeTypes: Set[String] =
-    Typed.typeClassesToTypeNames(classOf[ProjectType], classOf[FileType])
-
-  // Give your type a useful description
   override def description = "Travis CI type for manipulating CI configuration"
 
-  override def viewManifest: Manifest[TravisMutableView] = manifest[TravisMutableView]
+  override def runtimeClass = classOf[TravisMutableView]
 
-  override protected def findAllIn(
-                                    rugAs: ArtifactSource,
-                                    selected: Selected,
-                                    context: TreeNode,
-                                    poa: ProjectOperationArguments,
-                                    identifierMap: Map[String, Object]): Option[Seq[TreeNode]] = {
-    context match {
+  override def findAllIn(context: TreeNode): Option[Seq[TreeNode]] = context match {
       case pmv: ProjectMutableView =>
         Some(pmv.currentBackingObject.allFiles
           .filter(f => f.name == ".travis.yml")
@@ -42,5 +27,4 @@ class TravisType (
         Some(Seq(new TravisMutableView(fav.currentBackingObject, fav.parent, new RealTravisEndpoints)))
       case _ => None
     }
-  }
 }

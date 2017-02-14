@@ -7,7 +7,51 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/atomist-rugs/travis-rug-type/compare/0.5.0...HEAD
+[Unreleased]: https://github.com/atomist-rugs/travis-rug-type/compare/0.9.0...HEAD
+
+## [0.9.0] - 2017-02-14
+
+[0.9.0]: https://github.com/atomist-rugs/travis-rug-type/compare/0.8.0...0.9.0
+
+Valentine release
+
+### Changed
+
+-   Updates for rug 0.12.0
+
+## [0.8.0] - 2017-02-02
+
+[0.8.0]: https://github.com/atomist-rugs/travis-rug-type/compare/0.7.0...0.8.0
+
+New rug release
+
+### Changed
+
+-   Update to rug 0.11.0
+
+## [0.7.0] - 2017-01-18
+
+[0.7.0]: https://github.com/atomist-rugs/travis-rug-type/compare/0.6.0...0.7.0
+
+New rug release
+
+### Changed
+
+-   Update to rug 0.10.0
+
+## [0.6.0] - 2017-01-12
+
+[0.6.0]: https://github.com/atomist-rugs/travis-rug-type/compare/0.5.0...0.6.0
+
+Restart release
+
+### Added
+
+-   Restart build command
+
+### Changed
+
+-   Update to rug 0.9.0
 
 ## [0.5.0] - 2017-01-05
 
