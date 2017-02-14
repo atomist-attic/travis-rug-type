@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-[Unreleased]: https://github.com/atomist-rugs/travis-rug-type/compare/0.9.0...HEAD
+[Unreleased]: https://github.com/atomist-rugs/travis-rug-type/compare/0.9.1...HEAD
+
+## [0.9.1] - 2017-02-14
+
+[0.9.1]: https://github.com/atomist-rugs/travis-rug-type/compare/0.9.0...0.9.1
+
+### Changed
+
+-   Fix nodeTag for TravisCommand
 
 ## [0.9.0] - 2017-02-14
 

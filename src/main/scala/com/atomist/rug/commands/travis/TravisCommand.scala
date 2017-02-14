@@ -8,7 +8,7 @@ import java.util.{Collections, Set}
 
 class TravisCommand extends Command[ServicesMutableView] {
 
-  override def nodeTypes: Set[String] = Collections.singleton("services")
+  override def nodeTypes: Set[String] = Collections.singleton("Services")
 
   override def name: String = "travis"
 
